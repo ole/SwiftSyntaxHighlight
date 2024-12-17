@@ -37,5 +37,16 @@ let package = Package(
                 .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
+        .executableTarget(
+            name: "DemoApp",
+            dependencies: [
+                "SwiftSyntaxHighlight",
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+            ]
+        )
     ]
 )
