@@ -1,5 +1,6 @@
 import Foundation
 import SwiftSyntaxHighlight
+import SwiftIDEUtils
 import SwiftUI
 
 @main
@@ -47,10 +48,33 @@ struct ContentView: View {
 
     private var highlighted: AttributedString {
         var highlighted = highlight(sourceCode: sourceCode, as: AttributedString.self)
-        highlighted.replaceAttributes(
-            AttributeContainer().syntaxClassification(.keyword),
-            with: AttributeContainer().foregroundColor(.magenta).inlinePresentationIntent(.stronglyEmphasized)
-        )
+        for (syntaxKind, attributes) in theme {
+            highlighted.replaceAttributes(
+                AttributeContainer().syntaxClassification(syntaxKind),
+                with: attributes
+            )
+        }
         return highlighted
     }
 }
+
+let theme: [SyntaxClassification: AttributeContainer] = [
+    .attribute: .init().foregroundColor(.magenta),
+    .blockComment: .init().foregroundColor(.gray),
+    .docBlockComment: .init().foregroundColor(.gray),
+    .docLineComment: .init().foregroundColor(.gray),
+    .dollarIdentifier: .init(),
+    .editorPlaceholder: .init(),
+    .floatLiteral: .init().foregroundColor(.yellow),
+    .identifier: .init().foregroundColor(.blue),
+    .ifConfigDirective: .init(),
+    .integerLiteral: .init().foregroundColor(.yellow),
+    .keyword: .init().foregroundColor(.magenta).inlinePresentationIntent(.stronglyEmphasized),
+    .lineComment: .init().foregroundColor(.gray),
+    .none: .init(),
+    .operator: .init(),
+    .regexLiteral: .init().foregroundColor(.purple),
+    .stringLiteral: .init().foregroundColor(.red),
+    .type: .init().foregroundColor(.green),
+    .argumentLabel: .init(),
+]
