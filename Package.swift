@@ -19,7 +19,8 @@ let package = Package(
         .target(
             name: "SwiftSyntaxHighlight",
             dependencies: [
-                .product(name: "SwiftSyntax", package: "swift-syntax"),
+                .product(name: "SwiftIDEUtils", package: "swift-syntax"),
+                .product(name: "SwiftParser", package: "swift-syntax"),
             ]
         ),
         .testTarget(

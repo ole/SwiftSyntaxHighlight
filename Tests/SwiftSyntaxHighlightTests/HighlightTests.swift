@@ -1,6 +1,13 @@
 import SwiftSyntaxHighlight
 import Testing
 
-@Test func example() async throws {
-    // Write your test here and use APIs like `#expect(...)` to check expected conditions.
+@Test func stringLiteral() throws {
+    let source = """
+        print("Hello world!")
+        """
+    let expected = """
+        print(<span class="string-literal">"Hello world!"</span>)
+        """
+    let actual = highlight(sourceCode: source)
+    #expect(actual == expected)
 }
