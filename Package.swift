@@ -21,11 +21,21 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftIDEUtils", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
+                .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
         .testTarget(
             name: "SwiftSyntaxHighlightTests",
-            dependencies: ["SwiftSyntaxHighlight"]
+            dependencies: ["SwiftSyntaxHighlight"],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+            ]
         ),
     ]
 )
