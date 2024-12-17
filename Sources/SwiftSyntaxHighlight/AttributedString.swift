@@ -1,6 +1,27 @@
-import SwiftIDEUtils
+public import SwiftIDEUtils
 public import SwiftSyntax
 public import Foundation
+
+extension AttributeScopes {
+    public var swiftSyntax: SwiftSyntaxAttributeScope.Type {
+        SwiftSyntaxAttributeScope.self
+    }
+}
+
+public struct SwiftSyntaxAttributeScope: AttributeScope {
+    public let syntaxClassification: SyntaxClassificationAttribute
+
+    public enum SyntaxClassificationAttribute: AttributedStringKey {
+        public typealias Value = SyntaxClassification
+        public static let name: String = "SwiftSyntax.SyntaxClassification"
+    }
+}
+
+extension AttributeDynamicLookup {
+    public subscript<T: AttributedStringKey>(dynamicMember keyPath: KeyPath<SwiftSyntaxAttributeScope, T>) -> T {
+        return self[T.self]
+    }
+}
 
 extension AttributedString: OutputFormat {
     public typealias Output = Self
@@ -10,44 +31,11 @@ extension AttributedString: OutputFormat {
         var output = AttributedString()
         for segment in sourceCode.classifications {
             let sourceByteRange = segment.range.offset ..< segment.range.endOffset
-            switch segment.kind {
-            case .attribute:
-                break
-            case .blockComment:
-                break
-            case .docBlockComment:
-                break
-            case .docLineComment:
-                break
-            case .dollarIdentifier:
-                break
-            case .editorPlaceholder:
-                break
-            case .floatLiteral:
-                break
-            case .identifier:
-                break
-            case .ifConfigDirective:
-                break
-            case .integerLiteral:
-                break
-            case .keyword:
-                break
-            case .lineComment:
-                break
-            case .none:
-                break
-            case .operator:
-                break
-            case .regexLiteral:
-                break
-            case .stringLiteral:
-                break
-            case .type:
-                break
-            case .argumentLabel:
-                break
-            }
+            let attrString = AttributedString(
+                String(decoding: sourceBytes[sourceByteRange], as: UTF8.self),
+                attributes: AttributeContainer().syntaxClassification(segment.kind)
+            )
+            output.append(attrString)
         }
         return output
     }
