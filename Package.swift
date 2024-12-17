@@ -5,15 +5,22 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftSyntaxHighlight",
+    platforms: [.macOS(.v14), .macCatalyst(.v17), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .visionOS(.v1)],
     products: [
         .library(
             name: "SwiftSyntaxHighlight",
             targets: ["SwiftSyntaxHighlight"]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
+    ],
     targets: [
         .target(
-            name: "SwiftSyntaxHighlight"
+            name: "SwiftSyntaxHighlight",
+            dependencies: [
+                .product(name: "SwiftSyntax", package: "swift-syntax"),
+            ]
         ),
         .testTarget(
             name: "SwiftSyntaxHighlightTests",
