@@ -8,6 +8,6 @@ import Testing
     let expected = """
         print(<span class="string-literal">"Hello world!"</span>)
         """
-    let actual = highlight(sourceCode: source)
+    let actual = highlight(sourceCode: source, as: HTML.self)
     #expect(actual == expected)
 }
