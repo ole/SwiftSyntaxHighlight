@@ -22,27 +22,29 @@ struct SourceEditor: NSViewRepresentable {
 
     func updateNSView(_ textView: NSTextView, context: Context) {
         context.coordinator.parent = self
-        // FIXME: Syntax highlighting doesn't update when the user edits the text in the NSTextView.
-        // The cause is that this condition is too strict. We still have to rehighlight the text
-        // in some cases even if the text contents are unchanged at this point.
         if textView.string != text {
+            textView.string = text
+        }
+
+        // Apply syntax highlighting
+        if let textStorage = textView.textContentStorage?.attributedString as? NSTextStorage {
             var highlighted = text.highlighted
-            // someAttributeContainer.appKit.font = .monospacedSystemFont(ofSize: fontSize, weight: .regular)
+            // Assigning attrContainer.appKit.font = .monospacedSystemFont(…)
             // raises a Sendable warning for NSFont.
-            // Avoid this by going via the dictionary of NSAttributedString.Keys initializer.
+            // Avoid this by going through a NSAttributedString.Keys dictionary.
             let defaultAttributes = AttributeContainer([
                 NSAttributedString.Key.font: NSFont.monospacedSystemFont(ofSize: fontSize, weight: .regular),
                 NSAttributedString.Key.foregroundColor: NSColor.textColor,
             ])
             highlighted.mergeAttributes(defaultAttributes, mergePolicy: .keepCurrent)
-            // Modify the NSTextView's text storage instead of replacing it with a new object.
-            // Assigning a new NSTextStorage object to textView.textContentStorage?.attributedString
-            // makes the text view non-editable.
-            if let textStorage = textView.textContentStorage?.attributedString as? NSTextStorage {
-                textStorage.replaceCharacters(
-                    in: NSRange(location: 0, length: textStorage.length),
-                    with: NSTextStorage(highlighted)
-                )
+            let ns = NSAttributedString(highlighted)
+            // We know that `textView.string` and `highlighted` contain the same string.
+            // So we can iterate over one and apply the ranges to the other one.
+            ns.enumerateAttributes(
+                in: NSRange(location: 0, length: ns.length),
+                options: .longestEffectiveRangeNotRequired
+            ) { attributes, range, stop in
+                textStorage.setAttributes(attributes, range: range)
             }
         }
     }
