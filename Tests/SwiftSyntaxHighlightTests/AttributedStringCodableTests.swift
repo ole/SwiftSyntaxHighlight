@@ -83,7 +83,6 @@ struct Model: Codable {
         frameworkAttributes.uiKit.kern = 5
         #endif
         highlighted.mergeAttributes(frameworkAttributes)
-        print(highlighted)
 
         // When
         let encoder = JSONEncoder()
