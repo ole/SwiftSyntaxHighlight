@@ -35,18 +35,27 @@ struct ContentView: View {
 
     var body: some View {
         HSplitView {
-            SourceEditor(text: $sourceCode, fontSize: fontSize)
+            VStack(alignment: .leading, spacing: 0) {
+                Text("NSTextView").font(.headline).padding(8)
+                SourceEditor(text: $sourceCode, fontSize: fontSize)
+            }
 
-            // Left pane
-            TextEditor(text: $sourceCode)
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .monospaced()
-                .font(.system(size: fontSize))
+            HSplitView {
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("TextEditor").font(.headline).padding(8)
+                    TextEditor(text: $sourceCode)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .monospaced()
+                        .font(.system(size: fontSize))
+                }
 
-            // Right pane
-            Text(sourceCode.highlighted)
-                .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .font(.system(size: fontSize).monospaced())
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("Text").font(.headline).padding(8)
+                    Text(sourceCode.highlighted)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                        .font(.system(size: fontSize).monospaced())
+                }
+            }
         }
     }
 
