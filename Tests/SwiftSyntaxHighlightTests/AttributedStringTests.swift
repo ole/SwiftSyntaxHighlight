@@ -19,6 +19,7 @@ import Testing
             }
             
             var s = S()
+            // Add one
             s.x += 1
             """
         var expected = AttributedString()
@@ -40,6 +41,8 @@ import Testing
         expected.append(AttributedString(" = ", attributes: .init().syntaxClassification(.none)))
         expected.append(AttributedString("S", attributes: .init().syntaxClassification(.identifier)))
         expected.append(AttributedString("()\n", attributes: .init().syntaxClassification(.none)))
+        expected.append(AttributedString("// Add one", attributes: .init().syntaxClassification(.lineComment)))
+        expected.append(AttributedString("\n", attributes: .init().syntaxClassification(.none)))
         expected.append(AttributedString("s", attributes: .init().syntaxClassification(.identifier)))
         expected.append(AttributedString(".", attributes: .init().syntaxClassification(.none)))
         expected.append(AttributedString("x", attributes: .init().syntaxClassification(.identifier)))
@@ -49,6 +52,5 @@ import Testing
         expected.append(AttributedString("1", attributes: .init().syntaxClassification(.integerLiteral)))
         let actual = highlight(sourceCode: source, as: AttributedString.self)
         #expect(actual == expected)
-        print(actual)
     }
 }
