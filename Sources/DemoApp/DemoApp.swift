@@ -21,6 +21,8 @@ struct SwiftSyntaxHighlightDemo: App {
 
 #else
 
+import SwiftSyntaxHighlight
+
 @main
 struct Main {
     static func main() throws {

@@ -1,4 +1,8 @@
+#if canImport(FoundationEssentials)
+import FoundationEssentials
+#else
 import Foundation
+#endif
 import SwiftSyntaxHighlight
 import Testing
 #if canImport(AppKit)
