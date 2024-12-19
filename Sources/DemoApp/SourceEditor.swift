@@ -1,3 +1,4 @@
+#if canImport(SwiftUI) && canImport(AppKit)
 import AppKit
 import SwiftSyntaxHighlight
 import SwiftUI
@@ -66,3 +67,4 @@ extension SourceEditor {
         }
     }
 }
+#endif

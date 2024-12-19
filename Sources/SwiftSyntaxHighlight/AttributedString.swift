@@ -42,12 +42,14 @@ extension AttributeScopes {
 
         // Include the built-in attribute scopes so that all attributes get encoded/decoded
         // when using `AttributeScopes.SwiftSyntaxAttributes.self` as the `CodableConfiguration`.
-        public let accessibility: AttributeScopes.AccessibilityAttributes
         public let foundation: AttributeScopes.FoundationAttributes
         #if canImport(AppKit)
         public let appKit: AttributeScopes.AppKitAttributes
         #endif
         #if canImport(SwiftUI)
+        // AccessibilityAttributes are part of Foundation, but only exposed on Darwin.
+        // canImport(SwiftUI) covers all Darwin platforms.
+        public let accessibility: AttributeScopes.AccessibilityAttributes
         public let swiftUI: AttributeScopes.SwiftUIAttributes
         #endif
         #if canImport(UIKit)
