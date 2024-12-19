@@ -7,10 +7,8 @@ let package = Package(
     name: "SwiftSyntaxHighlight",
     platforms: [.macOS(.v14), .macCatalyst(.v17), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .visionOS(.v1)],
     products: [
-        .library(
-            name: "SwiftSyntaxHighlight",
-            targets: ["SwiftSyntaxHighlight"]
-        ),
+        .executable(name: "WebAssemblyExecutable", targets: ["WebAssemblyExecutable"]),
+        .library(name: "SwiftSyntaxHighlight", targets: ["SwiftSyntaxHighlight"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
@@ -31,6 +29,17 @@ let package = Package(
         .testTarget(
             name: "SwiftSyntaxHighlightTests",
             dependencies: ["SwiftSyntaxHighlight"],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+            ]
+        ),
+        .executableTarget(
+            name: "WebAssemblyExecutable",
+            dependencies: [
+                "SwiftSyntaxHighlight",
+            ],
             swiftSettings: [
                 .enableUpcomingFeature("ExistentialAny"),
                 .enableUpcomingFeature("InternalImportsByDefault"),
