@@ -83,8 +83,12 @@
     }
 
     const wasmModule = await loadWasmModule();
-    const memory = wasmModule.instance.exports.memory.buffer; 
+    const originalMemory = wasmModule.instance.exports.memory.buffer; 
     // 3538944 bytes = 54 pages a 65536 bytes
+    console.log('Memory:', originalMemory, 'maxByteLength:', originalMemory.maxByteLength);
+
+    wasmModule.instance.exports.memory.grow(100);
+    const memory = wasmModule.instance.exports.memory.buffer; 
     console.log('Memory:', memory, 'maxByteLength:', memory.maxByteLength);
 
     // Some Swift source code to highlight
