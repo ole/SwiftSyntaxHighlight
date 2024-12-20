@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Swift Syntax Highlight</title>
+</head>
+<body>
+  <h1>Swift Syntax Highlight</h1>
+  <script type="module">
+    async function loadWasmModule() {
+      const env = {
+        FOO: "FOO",
+      };
+      const textEncoder = new TextEncoder();
+      const envStrings = Object.entries(env).map(([k, v]) => `${k}=${v}`);
+      const envEncodedStrings = envStrings.map(s => textEncoder.encode(s + "\0"))
+      const envByteLength = envEncodedStrings.map(s => s.byteLength).reduce((sum, val) => sum + val);
+
+      try {
+        const imports = {
+          // Stubs for the WASI functions the Wasm module expects.
+          "wasi_snapshot_preview1": {
+            args_get() { console.log("args_get"); return 0; },
+            args_sizes_get() { console.log("args_sizes_get"); return 0; },
+            environ_get(environPtr, environBufferPtr){
+              console.log("environ_get");
+              const envByteLength = envEncodedStrings.map(s => s.byteLength).reduce((sum, val) => sum + val);
+              const environsPointerBuffer = new Uint32Array(wasmModule.instance.exports.memory.buffer, environPtr, envEncodedStrings.length);
+              const environsBuffer = new Uint8Array(wasmModule.instance.exports.memory.buffer, environBufferPtr, envByteLength)
+              let pointerOffset = 0;
+              for(let i = 0; i < envEncodedStrings.length; i++){
+                  const currentPointer = environBufferPtr + pointerOffset;
+                  environsPointerBuffer[i] = currentPointer;
+                  environsBuffer.set(envEncodedStrings[i], pointerOffset)  
+                  pointerOffset += envEncodedStrings[i].byteLength;
+              }
+              console.log("environ_get end");
+              return 0;
+            },
+            environ_sizes_get(environCountPtr, environBufferSizePtr) {
+              console.log("environ_sizes_get");
+              const countPointerBuffer = new Uint32Array(wasmModule.instance.exports.memory.buffer, environCountPtr, 1);
+              const sizePointerBuffer = new Uint32Array(wasmModule.instance.exports.memory.buffer, environBufferSizePtr, 1);
+              countPointerBuffer[0] = envEncodedStrings.length;
+              sizePointerBuffer[0] = envByteLength;
+              return 0;
+            },
+            clock_time_get() { console.log("clock_time_get"); return 0; },
+            fd_close() { console.log("fd_close"); return 0; },
+            fd_fdstat_get() { console.log("fd_fdstat_get"); return 0; },
+            fd_fdstat_set_flags() { console.log("fd_fdstat_set_flags"); return 0; },
+            fd_filestat_get() { console.log("fd_filestat_get"); return 0; },
+            fd_pread() { console.log("fd_pread"); return 0; },
+            fd_prestat_get() { console.log("fd_prestat_get"); return 0; },
+            fd_prestat_dir_name() { console.log("fd_prestat_dir_name"); return 0; },
+            fd_read() { console.log("fd_read"); return 0; },
+            fd_readdir() { console.log("fd_readdir"); return 0; },
+            fd_seek() { console.log("fd_seek"); return 0; },
+            fd_sync() { console.log("fd_sync"); return 0; },
+            fd_write() { console.log("fd_write"); return 0; },
+            path_create_directory() { console.log("path_create_directory"); return 0; },
+            path_filestat_get() { console.log("path_filestat_get"); return 0; },
+            path_filestat_set_times() { console.log("path_filestat_set_times"); return 0; },
+            path_link() { console.log("path_link"); return 0; },
+            path_open() { console.log("path_open"); return 0; },
+            path_readlink() { console.log("path_readlink"); return 0; },
+            path_remove_directory() { console.log("path_remove_directory"); return 0; },
+            path_rename() { console.log("path_rename"); return 0; },
+            path_symlink() { console.log("path_symlink"); return 0; },
+            path_unlink_file() { console.log("path_unlink_file"); return 0; },
+            poll_oneoff() { console.log("poll_oneoff"); return 0; },
+            proc_exit() { console.log("proc_exit"); return 0; },
+            random_get() { console.log("random_get"); return 0; },    
+          }
+        };
+        const wasmModule = await WebAssembly.instantiateStreaming(fetch('/.build/wasm32-unknown-wasi/release/WebAssemblyExecutable.wasm'), imports);
+        console.log('WASM Module loaded:', wasmModule);
+        return wasmModule;
+      } catch (error) {
+        console.error('Error loading WASM module:', error);
+      }
+    }
+
+    const wasmModule = await loadWasmModule();
+    const memory = wasmModule.instance.exports.memory.buffer; 
+    // 3538944 bytes = 54 pages a 65536 bytes
+    console.log('Memory:', memory, 'maxByteLength:', memory.maxByteLength);
+
+    // Some Swift source code to highlight
+    const source = `func hello() {
+      print("Hello, World!")
+    }`
+
+    // Allocate memory
+    const pointer = wasmModule.instance.exports.wacro_malloc(source.length);
+    console.log('Input pointer:', pointer);
+    // Use TextEncoder to write UTF-8 string `source` to `memory` at `pointer`:
+    const encoder = new TextEncoder();
+    const encoded = encoder.encode(source);
+    const sourceBuffer = new Uint8Array(memory, pointer, encoded.length);
+    sourceBuffer.set(encoded);
+
+    // Log byte at pointer
+    console.log('Byte at sourceBuffer[0]:', sourceBuffer[0]);
+    console.log('Byte at memory[pointer]:', (new Uint8Array(memory, 0, memory.byteLength))[pointer]);
+
+    // Highlight source code
+    const outputPointer = wasmModule.instance.exports.syntax_highlight(pointer, source.length);
+    console.log('Output pointer:', outputPointer);
+    // Read highlighted source code from `memory` at `outputPointer`:
+    // The first 4 bytes are the length of the string (little endian)
+    const outputLength = new DataView(memory).getUint32(outputPointer, true);
+    const outputBuffer = new Uint8Array(memory, outputPointer + 4, outputLength);
+    const decoder = new TextDecoder();
+    const highlighted = decoder.decode(outputBuffer);
+    console.log('Highlighted source code:', highlighted);
+  </script>
+</body>
+</html>
