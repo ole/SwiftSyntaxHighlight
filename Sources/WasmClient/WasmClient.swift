@@ -46,11 +46,25 @@ struct App {
         let inputData = sourceCode.utf8
         let inputLength = inputData.count
         let inAddr = try malloc.invoke([.i32(UInt32(inputLength))])[0].i32
+        defer {
+            do {
+                try free.invoke([.i32(inAddr)])
+            } catch {
+                print("Error freeing Wasm memory: \(error)")
+            }
+        }
         print("inAddr:", inAddr)
         memory.withUnsafeMutableBufferPointer(offset: UInt(inAddr), count: inputLength) { buffer in
             buffer.copyBytes(from: inputData)
         }
         let outAddr = try syntax_highlight.invoke([.i32(inAddr), .i32(UInt32(inputLength))])[0].i32
+        defer {
+            do {
+                try free.invoke([.i32(outAddr)])
+            } catch {
+                print("Error freeing Wasm memory: \(error)")
+            }
+        }
         print("outAddr:", outAddr)
         let outputLength = memory.withUnsafeMutableBufferPointer(offset: UInt(outAddr), count: 4) { buffer in
             let length =

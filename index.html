@@ -95,21 +95,17 @@
       print("Hello, World!")
     }`
 
-    // Allocate memory
-    const pointer = wasmModule.instance.exports.sh_malloc(source.length);
-    console.log('Input pointer:', pointer);
+    // Allocate memory for input string.
+    const inputPointer = wasmModule.instance.exports.sh_malloc(source.length);
+    console.log('Input pointer:', inputPointer);
     // Use TextEncoder to write UTF-8 string `source` to `memory` at `pointer`:
     const encoder = new TextEncoder();
     const encoded = encoder.encode(source);
-    const sourceBuffer = new Uint8Array(memory, pointer, encoded.length);
+    const sourceBuffer = new Uint8Array(memory, inputPointer, encoded.length);
     sourceBuffer.set(encoded);
 
-    // Log byte at pointer
-    console.log('Byte at sourceBuffer[0]:', sourceBuffer[0]);
-    console.log('Byte at memory[pointer]:', (new Uint8Array(memory, 0, memory.byteLength))[pointer]);
-
     // Highlight source code
-    const outputPointer = wasmModule.instance.exports.syntax_highlight(pointer, source.length);
+    const outputPointer = wasmModule.instance.exports.syntax_highlight(inputPointer, source.length);
     console.log('Output pointer:', outputPointer);
     // Read highlighted source code from `memory` at `outputPointer`:
     // The first 4 bytes are the length of the string (little endian)
@@ -117,6 +113,11 @@
     const outputBuffer = new Uint8Array(memory, outputPointer + 4, outputLength);
     const decoder = new TextDecoder();
     const highlighted = decoder.decode(outputBuffer);
+
+    // Free allocated memory.
+    wasmModule.instance.exports.sh_free(inputPointer);
+    wasmModule.instance.exports.sh_free(outputPointer);
+
     console.log('Highlighted source code:', highlighted);
   </script>
 </body>
