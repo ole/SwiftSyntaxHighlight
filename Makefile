@@ -12,10 +12,13 @@
 #
 # (or similar)
 wasmlib:
+	# Build as a WebAssembly reactor module (the default is 'command').
+	# See https://github.com/WebAssembly/WASI/blob/main/legacy/application-abi.md
 	swift build \
 		--swift-sdk wasm32-unknown-wasi \
 		--product SwiftSyntaxHighlight-wasm \
 		-c release \
+		-Xswiftc -Xclang-linker -Xswiftc -mexec-model=reactor \
 		-Xswiftc -Osize
 	cp -a .build/wasm32-unknown-wasi/release/SwiftSyntaxHighlight-wasm.wasm SwiftSyntaxHighlight.wasm
 	type -p wasm-opt && wasm-opt -Os --strip-debug SwiftSyntaxHighlight.wasm -o SwiftSyntaxHighlight.wasm || :

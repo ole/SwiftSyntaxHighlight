@@ -43,6 +43,7 @@ var package = Package(
             name: "WasmClient",
             dependencies: [
                 .product(name: "WasmKit", package: "WasmKit"),
+                .product(name: "WASI", package: "WasmKit"),
                 .product(name: "WasmKitWASI", package: "WasmKit"),
             ]
         ),

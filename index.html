@@ -83,8 +83,9 @@
     }
 
     const wasmModule = await loadWasmModule();
-    // We MUST call the _start function first.
-    wasmModule.instance.exports._start();
+    // We must call the _initialize function first.
+    // See: https://github.com/WebAssembly/WASI/blob/main/legacy/application-abi.md
+    wasmModule.instance.exports._initialize();
 
     const memory = wasmModule.instance.exports.memory.buffer; 
     // 3,538,944 bytes = 54 pages a 65536 bytes

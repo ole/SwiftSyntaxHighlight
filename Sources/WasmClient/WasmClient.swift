@@ -1,4 +1,5 @@
 import SystemPackage
+import WASI
 import WasmKit
 import WasmKitWASI
 
@@ -17,13 +18,14 @@ struct App {
         var imports = Imports()
         wasi.link(to: &imports, store: store)
         let instance = try module.instantiate(store: store, imports: imports)
-
         print("Wasm instance:", instance)
-        _ = try wasi.start(instance)
 
         let exports = instance.exports
         guard case .memory(let memory) = exports["memory"] else {
             fatalError("bad memory")
+        }
+        guard case .function(let _initialize) = exports["_initialize"] else {
+            fatalError("bad _initialize")
         }
         guard case .function(let malloc) = exports["sh_malloc"] else {
             fatalError("bad sh_malloc")
@@ -34,6 +36,10 @@ struct App {
         guard case .function(let syntax_highlight) = exports["syntax_highlight"] else {
             fatalError("bad syntax_highlight")
         }
+
+        // We must call _initialize first.
+        // See: https://github.com/WebAssembly/WASI/blob/main/legacy/application-abi.md
+        try _initialize.invoke()
 
         let sourceCode = """
             print("Hello world")
