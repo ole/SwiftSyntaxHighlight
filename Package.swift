@@ -3,7 +3,7 @@
 
 import PackageDescription
 
-let package = Package(
+var package = Package(
     name: "SwiftSyntaxHighlight",
     platforms: [.macOS(.v14), .macCatalyst(.v17), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .visionOS(.v1)],
     products: [
@@ -20,31 +20,16 @@ let package = Package(
             dependencies: [
                 .product(name: "SwiftIDEUtils", package: "swift-syntax"),
                 .product(name: "SwiftParser", package: "swift-syntax"),
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("InternalImportsByDefault"),
-                .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
         .testTarget(
             name: "SwiftSyntaxHighlightTests",
-            dependencies: ["SwiftSyntaxHighlight"],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("InternalImportsByDefault"),
-                .enableUpcomingFeature("MemberImportVisibility"),
-            ]
+            dependencies: ["SwiftSyntaxHighlight"]
         ),
         .executableTarget(
             name: "WebAssemblyExecutable",
             dependencies: [
                 "SwiftSyntaxHighlight",
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("InternalImportsByDefault"),
-                .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
         // A CLI app that loads the WebAssembly module and uses it to
@@ -54,11 +39,6 @@ let package = Package(
             dependencies: [
                 .product(name: "WasmKit", package: "WasmKit"),
                 .product(name: "WasmKitWASI", package: "WasmKit"),
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("InternalImportsByDefault"),
-                .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
         // A SwiftUI app that provides a simple source code editor
@@ -67,12 +47,26 @@ let package = Package(
             name: "DemoApp",
             dependencies: [
                 "SwiftSyntaxHighlight",
-            ],
-            swiftSettings: [
-                .enableUpcomingFeature("ExistentialAny"),
-                .enableUpcomingFeature("InternalImportsByDefault"),
-                .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
     ]
 )
+
+let swift6Settings: [SwiftSetting] = [
+    // SE-0335: Introduce existential any
+    // <https://github.com/apple/swift-evolution/blob/main/proposals/0335-existential-any.md>
+    .enableUpcomingFeature("ExistentialAny"),
+    // SE-0409: Access-level modifiers on import declarations
+    // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0409-access-level-on-imports.md>
+    .enableUpcomingFeature("InternalImportsByDefault"),
+    // SE-0444: Member import visibility
+    // <https://github.com/swiftlang/swift-evolution/blob/main/proposals/0444-member-import-visibility.md>
+    .enableUpcomingFeature("MemberImportVisibility"),
+]
+
+for idx in package.targets.indices {
+    let target = package.targets[idx]
+    var newSwiftSettings = target.swiftSettings ?? []
+    newSwiftSettings.append(contentsOf: swift6Settings)
+    package.targets[idx].swiftSettings = newSwiftSettings
+}
