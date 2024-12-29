@@ -74,7 +74,7 @@
             random_get() { console.log("random_get"); return 0; },    
           }
         };
-        const wasmModule = await WebAssembly.instantiateStreaming(fetch('/.build/wasm32-unknown-wasi/release/WebAssemblyExecutable.wasm'), imports);
+        const wasmModule = await WebAssembly.instantiateStreaming(fetch('/SwiftSyntaxHighlight.wasm'), imports);
         console.log('WASM Module loaded:', wasmModule);
         return wasmModule;
       } catch (error) {
@@ -96,7 +96,7 @@
     }`
 
     // Allocate memory
-    const pointer = wasmModule.instance.exports.wacro_malloc(source.length);
+    const pointer = wasmModule.instance.exports.sh_malloc(source.length);
     console.log('Input pointer:', pointer);
     // Use TextEncoder to write UTF-8 string `source` to `memory` at `pointer`:
     const encoder = new TextEncoder();

@@ -7,14 +7,17 @@ var package = Package(
     name: "SwiftSyntaxHighlight",
     platforms: [.macOS(.v14), .macCatalyst(.v17), .iOS(.v17), .tvOS(.v17), .watchOS(.v10), .visionOS(.v1)],
     products: [
-        .executable(name: "WebAssemblyExecutable", targets: ["WebAssemblyExecutable"]),
+        // A Swift library for syntax highlighting Swift source code.
         .library(name: "SwiftSyntaxHighlight", targets: ["SwiftSyntaxHighlight"]),
+        .executable(name: "SwiftSyntaxHighlight-wasm", targets: ["WasmLib"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
         .package(url: "https://github.com/swiftwasm/WasmKit.git", from: "0.1.0"),
     ],
     targets: [
+        // A Swift library for syntax highlighting Swift source code.
+        // Uses SwiftSyntax for parsing the source code.
         .target(
             name: "SwiftSyntaxHighlight",
             dependencies: [
@@ -26,13 +29,15 @@ var package = Package(
             name: "SwiftSyntaxHighlightTests",
             dependencies: ["SwiftSyntaxHighlight"]
         ),
+        // A WebAssembly library that exposes the functionality of the
+        // SwiftSyntaxHighlight library to Wasm clients.
         .executableTarget(
-            name: "WebAssemblyExecutable",
+            name: "WasmLib",
             dependencies: [
                 "SwiftSyntaxHighlight",
             ]
         ),
-        // A CLI app that loads the WebAssembly module and uses it to
+        // A CLI demo app that loads the WebAssembly module and uses it to
         // syntax highlight some Swift code.
         .executableTarget(
             name: "WasmClient",
@@ -41,7 +46,7 @@ var package = Package(
                 .product(name: "WasmKitWASI", package: "WasmKit"),
             ]
         ),
-        // A SwiftUI app that provides a simple source code editor
+        // A SwiftUI demo app that provides a simple source code editor
         // with Swift syntax highlighting.
         .executableTarget(
             name: "DemoApp",

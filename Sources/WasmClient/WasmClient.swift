@@ -8,7 +8,7 @@ struct App {
         // Parse a WASI-compliant WebAssembly module from a file.
         let wasmModulePath = FilePath(#filePath)
             .removingLastComponent()
-            .appending("../../.build/wasm32-unknown-wasi/release/WebAssemblyExecutable.wasm")
+            .appending("../../SwiftSyntaxHighlight.wasm")
             .lexicallyNormalized()
         let module = try parseWasm(filePath: wasmModulePath)
         let wasi = try WASIBridgeToHost()
@@ -25,11 +25,11 @@ struct App {
         guard case .memory(let memory) = exports["memory"] else {
             fatalError("bad memory")
         }
-        guard case .function(let malloc) = exports["wacro_malloc"] else {
-            fatalError("bad wacro_malloc")
+        guard case .function(let malloc) = exports["sh_malloc"] else {
+            fatalError("bad sh_malloc")
         }
-        guard case .function(let free) = exports["wacro_free"] else {
-            fatalError("bad wacro_free")
+        guard case .function(let free) = exports["sh_free"] else {
+            fatalError("bad sh_free")
         }
         guard case .function(let syntax_highlight) = exports["syntax_highlight"] else {
             fatalError("bad syntax_highlight")
