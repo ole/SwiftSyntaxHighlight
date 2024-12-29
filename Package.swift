@@ -12,6 +12,7 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
+        .package(url: "https://github.com/swiftwasm/WasmKit.git", from: "0.1.0"),
     ],
     targets: [
         .target(
@@ -46,6 +47,22 @@ let package = Package(
                 .enableUpcomingFeature("MemberImportVisibility"),
             ]
         ),
+        // A CLI app that loads the WebAssembly module and uses it to
+        // syntax highlight some Swift code.
+        .executableTarget(
+            name: "WasmClient",
+            dependencies: [
+                .product(name: "WasmKit", package: "WasmKit"),
+                .product(name: "WasmKitWASI", package: "WasmKit"),
+            ],
+            swiftSettings: [
+                .enableUpcomingFeature("ExistentialAny"),
+                .enableUpcomingFeature("InternalImportsByDefault"),
+                .enableUpcomingFeature("MemberImportVisibility"),
+            ]
+        ),
+        // A SwiftUI app that provides a simple source code editor
+        // with Swift syntax highlighting.
         .executableTarget(
             name: "DemoApp",
             dependencies: [
@@ -56,6 +73,6 @@ let package = Package(
                 .enableUpcomingFeature("InternalImportsByDefault"),
                 .enableUpcomingFeature("MemberImportVisibility"),
             ]
-        )
+        ),
     ]
 )
