@@ -22,3 +22,8 @@ wasmlib:
 		-Xswiftc -Osize
 	cp -a .build/wasm32-unknown-wasi/release/SwiftSyntaxHighlight-wasm.wasm SwiftSyntaxHighlight.wasm
 	type -p wasm-opt && wasm-opt -Os --strip-debug SwiftSyntaxHighlight.wasm -o SwiftSyntaxHighlight.wasm || :
+
+# Launch a local web server to test the WebAssembly module.
+serve:
+	cd WebClient && \
+	python3 -m http.server 8000
