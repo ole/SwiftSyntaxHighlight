@@ -10,44 +10,31 @@ public struct HTML: OutputFormat {
         output.reserveCapacity(sourceBytes.count)
         for segment in sourceCode.classifications {
             let sourceByteRange = segment.range.offset ..< segment.range.endOffset
-            switch segment.kind {
-            case .attribute:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .blockComment:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .docBlockComment:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .docLineComment:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .dollarIdentifier:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .editorPlaceholder:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .floatLiteral:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .identifier:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .ifConfigDirective:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .integerLiteral:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .keyword:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .lineComment:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .none:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .operator:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .regexLiteral:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .stringLiteral:
-                output.append(contentsOf: #"<span class="string-literal">"#.utf8)
+            let cssClass: String? = switch segment.kind {
+            case .attribute: "attribute"
+            case .blockComment: "block-comment"
+            case .docBlockComment: "doc-block-comment"
+            case .docLineComment: "doc-line-comment"
+            case .dollarIdentifier: "dollar-identifier"
+            case .editorPlaceholder: "editor-placeholder"
+            case .floatLiteral: "float-literal"
+            case .identifier: "identifier"
+            case .ifConfigDirective: "if-config-directive"
+            case .integerLiteral: "integer-literal"
+            case .keyword: "keyword"
+            case .lineComment: "line-comment"
+            case .none: nil
+            case .operator: "operator"
+            case .regexLiteral: "regex-literal"
+            case .stringLiteral: "string-literal"
+            case .type: "type"
+            case .argumentLabel: "argument-label"
+            }
+            if let cssClass {
+                output.append(contentsOf: #"<span class="\#(cssClass)">"#.utf8)
                 output.append(contentsOf: sourceBytes[sourceByteRange])
                 output.append(contentsOf: #"</span>"#.utf8)
-            case .type:
-                output.append(contentsOf: sourceBytes[sourceByteRange])
-            case .argumentLabel:
+            } else {
                 output.append(contentsOf: sourceBytes[sourceByteRange])
             }
         }
