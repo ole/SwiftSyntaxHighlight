@@ -3,6 +3,7 @@ import FoundationEssentials
 #else
 import Foundation
 #endif
+import SwiftIDEUtils
 import SwiftSyntaxHighlight
 import Testing
 
