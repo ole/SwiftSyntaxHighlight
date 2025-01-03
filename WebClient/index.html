@@ -156,15 +156,15 @@ func hello() {
         return;
       }
 
-      // Handle 'insertParagraph' event type to insert a newline
+      // Handle 'insertParagraph' event type to insert a newline.
       if (event.inputType === 'insertParagraph') {
         const sel = document.getSelection();
         const range = sel.getRangeAt(0);
         range.deleteContents();
         const br = document.createTextNode('\n');
         range.insertNode(br);
-        range.setStartAfter(br);
-        range.setEndAfter(br);
+        range.setStartBefore(br);
+        range.setEndBefore(br);
         sel.removeAllRanges();
         sel.addRange(range);
       }
