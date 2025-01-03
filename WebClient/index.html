@@ -118,26 +118,30 @@ func hello() {
      * @returns {string} - The highlighted source code as HTML.
      */
     function highlight(sourceCode) {
-      const memory = wasmModule.instance.exports.memory.buffer; 
-      // 3,538,944 bytes = 54 pages a 65536 bytes
-      //console.log('Memory:', memory, 'maxByteLength:', memory.maxByteLength);
-
       // Allocate memory for input string.
       const inputPointer = wasmModule.instance.exports.sh_malloc(sourceCode.length);
       //console.log('Input pointer:', inputPointer);
-      // Use TextEncoder to write UTF-8 string `source` to `memory` at `pointer`:
+      // Use TextEncoder to write UTF-8 string `source` to memory at `pointer`:
       const encoder = new TextEncoder();
       const encoded = encoder.encode(sourceCode);
-      const sourceBuffer = new Uint8Array(memory, inputPointer, encoded.length);
+
+      // Need to re-retrieve memory after every call that may have grown it.
+      const mem1 = wasmModule.instance.exports.memory.buffer; 
+      // 3,538,944 bytes = 54 pages a 65536 bytes
+      //console.log('Memory:', mem1, 'maxByteLength:', mem1.maxByteLength);
+      const sourceBuffer = new Uint8Array(mem1, inputPointer, encoded.length);
       sourceBuffer.set(encoded);
 
       // Highlight source code
       const outputPointer = wasmModule.instance.exports.syntax_highlight(inputPointer, sourceCode.length);
       //console.log('Output pointer:', outputPointer);
+
       // Read highlighted source code from `memory` at `outputPointer`:
       // The first 4 bytes are the length of the string (little endian)
-      const outputLength = new DataView(memory).getUint32(outputPointer, true);
-      const outputBuffer = new Uint8Array(memory, outputPointer + 4, outputLength);
+      // Need to re-retrieve memory after every call that may have grown it.
+      const mem2 = wasmModule.instance.exports.memory.buffer; 
+      const outputLength = new DataView(mem2).getUint32(outputPointer, true);
+      const outputBuffer = new Uint8Array(mem2, outputPointer + 4, outputLength);
       const decoder = new TextDecoder();
       const highlighted = decoder.decode(outputBuffer);
 
