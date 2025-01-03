@@ -14,15 +14,22 @@
       white-space: pre;
       overflow-x: auto;
     }
-    .string-literal {
-      color: red;
+    .line-comment, .block-comment, .doc-line-comment, .doc-block-comment {
+      color: green;
     }
+    .keyword { color: magenta; }
+    .integer-literal, .float-literal { color: blue; }
+    .regex-literal { color: purple; }
+    .string-literal { color: red; }
   </style>
 </head>
 <body>
   <h1>Swift Syntax Highlight</h1>
-  <div id="editor" contenteditable="true">func hello() {
-    print("Hello, World!")
+  <div id="editor" contenteditable="true">/// This is a doc comment
+func hello() {
+    let pi = 3.14
+    let regex = /abc.+/
+    print("Pi is \(pi)")
 }
 </div>
 
@@ -141,7 +148,6 @@
     }
 
     // Install event listeners.
-    // Call highlight on load and on input.
     const editor = document.getElementById('editor');
     editor.innerHTML = highlight(editor.textContent);
     editor.addEventListener('input', (event) => {
@@ -149,6 +155,20 @@
       if (event.isComposing) {
         return;
       }
+
+      // Handle 'insertParagraph' event type to insert a newline
+      if (event.inputType === 'insertParagraph') {
+        const sel = document.getSelection();
+        const range = sel.getRangeAt(0);
+        range.deleteContents();
+        const br = document.createTextNode('\n');
+        range.insertNode(br);
+        range.setStartAfter(br);
+        range.setEndAfter(br);
+        sel.removeAllRanges();
+        sel.addRange(range);
+      }
+      
       const sel = document.getSelection();
       const range = sel.getRangeAt(0);
       let cursorPosition = range.startOffset;
@@ -199,7 +219,8 @@
       range.setStart(node, offset);
       range.collapse(true);
       sel.removeAllRanges();
-      sel.addRange(range);    });
+      sel.addRange(range);
+    });
   </script>
 </body>
 </html>
