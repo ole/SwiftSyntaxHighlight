@@ -39,6 +39,10 @@ struct App {
 
         // We must call _initialize first.
         // See: https://github.com/WebAssembly/WASI/blob/main/legacy/application-abi.md
+        //
+        // TODO: Replace with `wasi.initialize(instance)` (and move up above
+        // accessing the exports once https://github.com/swiftwasm/WasmKit/pull/173
+        // (merged 2025-01-10) has landed in a release.
         try _initialize.invoke()
 
         let sourceCode = """
